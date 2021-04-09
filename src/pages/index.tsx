@@ -1,85 +1,115 @@
-import {Aside, Container, Main, Formulario, AddressContainer} from '../styles/PageStyles/Home.style'
+
 import InputMask from 'react-input-mask'
 import {useForm } from 'react-hook-form'
-import { GetFactory } from '../Factories/GetFactory'
-import {PostFactory} from '../Factories/PostFactory'
 import React from 'react'
-import {requiredFields} from '../Util/RequiredFields'
-import { IForm } from '../interfaces/IForm'
-import {normalize} from '../Util/Normalize'
+import Router from 'next/router'
+import {
+  AddressContainer, Aside, Container, ErrorContainer, Formulario, Main, //Importando os Components Styled
+  PostFactory, GetFactory, //Factorys
+  normalize, //Normalizer dos Campos Cep e Phone
+  IForm, //Interface dos Formularios
+  requiredFields //Campos Requiridos para preencher o endereço após consulta
+} from '../PageProtocols/indexProtocols' //As importações estão sendo feitas em PageProtocols
+
     
     
 const Home: React.FC = () => {
-  const { register, handleSubmit, formState: { errors}, getValues, setValue } = useForm()
-  const [addressEditable, setAddressEditable] = React.useState({
+  const { register, handleSubmit, formState: { errors}, getValues, setValue } = useForm() //React form
+  const [addressEditable, setAddressEditable] = React.useState({ //State se campos estão editaveis ou não
     city: true,
     state: true,
     district: true,
     address: true
   })
-  const [showAddress, setShowAddress] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
+  const [showAddress, setShowAddress] = React.useState(false) //State se deve ou não mostrar os campos de endereço
+  const [loading, setLoading] = React.useState(false) //State se a tela esta carregando ou não
+  const [error, setError] = React.useState<any | null>(null) //State do erro Apresentado apos submit
 
-  const handle = async (data: IForm) => {
-    const Post = PostFactory()
+  const handle = async (data: IForm) => { //Function q lida com o Submit
+    const Post = PostFactory() 
     try {
-      const body: IForm = {
+      setLoading(true) //Inicia o estado de loading
+      const body: IForm = { //Preenchendo campo body
         name: data.name,
-        phone:  normalize(data.phone) ,
+        phone:  normalize(data.phone) , //Normalize para tirar qualquer caracter q nao seja number
         addressCity: data.addressCity,
         addressComplement: data.addressComplement,
         addressDistrict: data.addressDistrict,
         addressNumber: data.addressNumber,
         addressState: data.addressState,
         addressStreet: data.addressState,
-        addressZip: data.addressZip,
+        addressZip: normalize(data.addressZip),
         email: data.email
       }
-      setLoading(true)
-      const response = await Post.handle({
+      
+      const response = await Post.handle({ //Realizendo o post
         body: body,
         url: 'https://simple-api-selection.herokuapp.com/submit/'
         
       })
-      console.log(response)
+      switch (response.StatusCode) { //testando respostas
+        case 200:
+          Router.push('/success')
+          break;
+        case 400:
+          setError(response.body) //Se houve Erro, Ele está sendo setado agora
+          setTimeout(() => {   //Timer que remove o erro da tela apos x segundos
+            setError(null)
+          }, 10000)
+          break;
+        case 500:
+          setError('Algo deu Errado, tente novamente mais tarde')
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
+          break;
+      }
     } finally {
-      setLoading(false)
+      setLoading(false) //Finaliza o estado de loading
     }
   }
 
-  const handleCepClick = async () => {
+  const handleCepClick = async () => { //FUnction que lida com a consulta do cep
     const Get = GetFactory()
     const response = await Get.handle({ body: {}, url: `https://ws.apicep.com/cep/${getValues().addressZip}.json` })
-    let Temporary = Object.assign({}, addressEditable)
+    let Temporary = Object.assign({}, addressEditable) //Copiando o State de Editaveis
     
     
-    requiredFields.forEach(field => {
+    requiredFields.forEach(field => { //Reseta todos os campos antes da consulta
       Temporary[field.response] = true
     });
-    if (response.body.status === 200) {
-      requiredFields.forEach(field => {
+    if (response.body.status === 200) { //Se A consulta der certo
+      requiredFields.forEach(field => { //Prenche os campos Inserindo os valores
         if (response.body[field.response]) {
           setValue(field.field, response.body[field.response], {shouldValidate: true})
-        } else {
+        } else {  //Se uma informção não esta disponivel, o campo fica editavel
           Temporary[field.response] = false
         }
       });
       
-    } if (response.body.status === 400 || response.body.status === 404) {
+    } if (response.body.status === 400 || response.body.status === 404) { //Se a consulta falhou, todos sao editaveis
       requiredFields.forEach(field => {
           Temporary[field.response] = false
       });
     }
-    setAddressEditable(Temporary)
-    setShowAddress(true)
-  }
+    setAddressEditable(Temporary) //Seta os Campos selecionados
+    setShowAddress(true)  //Seta para mostrar os campos de endereço
+  }  
 
   return (
     <Container>
-      <Aside></Aside>
+      <Aside></Aside> {/*Campo com a Imagem*/}
+
       <Main>
-        <h1>Formulario</h1>
-        <Formulario onSubmit={handleSubmit(handle)}>
+        <ErrorContainer> {/*Onde é inserido o erro na tela, testando se a resposta eh um array ou so uma string*/}
+           {Array.isArray(error) && error.map((err, index) => {
+            return <p key={index}>{err.field}. {err.error}</p>
+           })}
+          {typeof(error) === 'string' && <p>{error}</p>}
+        </ErrorContainer>
+       {/*Os Estados do campos dos formularios são controlados pelo react-hook-form e as mascaras são feitas através  do react-input-mask*/}
+        <h1>Formulario </h1>
+        <Formulario onSubmit={handleSubmit(handle)} >
           <div className="Field">
             <label htmlFor="name" >Nome: </label>
             <input type="text" id="name"  {...register("name", {required: true})}/>
@@ -92,7 +122,8 @@ const Home: React.FC = () => {
           </div>
           <div className="Field">
             <label htmlFor="phone" >Telefone: </label>
-            <InputMask id="phone" mask="(99)99999-9999" {...register("phone", {required: true, pattern: {value: /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/, message: "Preenchido Incorretamente"}})}/>
+              <InputMask id="phone" mask="(99)9999-9999" 
+            {...register("phone", { required: true, pattern: { value: /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/, message: "Preenchido Incorretamente" } })}/>
             {errors && errors.phone && errors.phone.type === 'required'? <p>Campo não Preenchido</p>: null}
             {errors && errors.phone && errors.phone.type === 'pattern' ? <p>Preenchido Incorretamente</p> : null}
           </div>
@@ -139,7 +170,6 @@ const Home: React.FC = () => {
             </div>
           </AddressContainer>
           {loading? <button type="submit" disabled>Carregando</button>: <button type="submit">Enviar</button>}
-          
           </Formulario>
       </Main>
     </Container>

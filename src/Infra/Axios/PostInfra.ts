@@ -11,17 +11,10 @@ export class PostInfra implements IPostInfra{
             StatusCode: 200,
             body: response.data
           }
-        case 400:
-        case 404:
-          return {
-            StatusCode: response.status,
-            body: 'Não Encontrado'
-          }
       }
       
     })
       .catch((error) => {
-        console.log(error.response.status)
         return {
           StatusCode: error.response.status,
           body: error.response.data

@@ -2,15 +2,20 @@ import styled from 'styled-components'
 
 export const Container = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   width: calc(100% - 20px);
+  min-height: 100vh;
 
-  @media(max-width: 1000px){
+  @media(max-width: 800px){
     grid-template-columns: 1fr;
+    width: 100%;
   }
 `;
 
 export const Aside = styled.div`
+  background: url('/wallpaper.jpg');
+  background-position: center center;
+  background-size: cover;
   @media(max-width: 1000px){
     display: none;
   }
@@ -18,19 +23,20 @@ export const Aside = styled.div`
 
 export const Main = styled.main`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0px 10px;
+  position: relative;
 `;
 
 export const Formulario = styled.form`
   width: 100%;
-  margin: 0px;
-
-  input{
-    height: 30px;
-    padding: 0px 10px;
-  }
+  justify-content: center;
 
   .Field{
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
 
     p{
       padding: 0px;
@@ -42,22 +48,31 @@ export const Formulario = styled.form`
   input{
     width: 100%;
   }
+
+  button{
+    height: 40px;
+  }
   
   .Cep{
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 100px;
     width: 100%;
+    align-items: center;
+    grid-gap: 10px;
+    margin-bottom: 5px;
 
     input{
       width: 100%;
     }
-    
+
     button{
-      margin-left: 20px;
-      width: 100px;
-      height: 30px;
+      height: 100%;
     }
   }
+`;
+
+export const ErrorContainer = styled.div`
+  color: red;
 `;
 
 

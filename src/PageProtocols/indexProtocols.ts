@@ -1,0 +1,6 @@
+export { GetFactory } from '../Factories/GetFactory'
+export { PostFactory } from '../Factories/PostFactory'
+export { Aside, Container, Main, Formulario, ErrorContainer, AddressContainer } from '../styles/PageStyles/Home.style'
+export { IForm } from  '../interfaces/IForm' 
+export { normalize } from '../Util/Normalize'
+export {requiredFields} from '../Util/RequiredFields'
