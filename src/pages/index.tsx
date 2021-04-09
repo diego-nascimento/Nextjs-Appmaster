@@ -7,10 +7,9 @@ import {
   AddressContainer, Aside, Container, ErrorContainer, Formulario, Main, //Importando os Components Styled
   PostFactory, GetFactory, //Factorys
   normalize, //Normalizer dos Campos Cep e Phone
-  IForm, //Interface dos Formularios
   requiredFields //Campos Requiridos para preencher o endereço após consulta
 } from '../PageProtocols/indexProtocols' //As importações estão sendo feitas em PageProtocols
-
+import {IForm} from '../interfaces/IForm'  //Interface dos Formularios
     
     
 const Home: React.FC = () => {
@@ -96,10 +95,16 @@ const Home: React.FC = () => {
     setShowAddress(true)  //Seta para mostrar os campos de endereço
   }  
 
+  const handleCepChange = () =>{
+    console.log('vai')
+    requiredFields.forEach(field => { //Reseta todos os campos antes da consulta
+      setValue(field.field, '', {shouldValidate: true})
+    });
+  }
+
   return (
     <Container>
       <Aside></Aside> {/*Campo com a Imagem*/}
-
       <Main>
         <ErrorContainer> {/*Onde é inserido o erro na tela, testando se a resposta eh um array ou so uma string*/}
            {Array.isArray(error) && error.map((err, index) => {
@@ -129,8 +134,8 @@ const Home: React.FC = () => {
           </div>
            <div className="Cep">
               <div className="Field"> 
-                <label htmlFor="addressZip" >Cep: </label>
-                <InputMask id="addressZip"  mask="99999-999" {...register("addressZip", {required: true, pattern: {value: /^[0-9]{5}-[0-9]{3}$/, message: "Preenchido Incorretamente"}})}/>
+                <label htmlFor="Cep" >Cep: </label>
+                <InputMask id="Cep"  mask="99999-999" {...register("addressZip", {required: true, pattern: {value: /^[0-9]{5}-[0-9]{3}$/, message: "Preenchido Incorretamente"}})}/>
                 {errors && errors.addressZip && errors.addressZip.type === 'required'? <p>Campo não Preenchido</p>: null}
                 {errors && errors.addressZip && errors.addressZip.type === 'pattern' ? <p>Preenchido Incorretamente</p> : null}
               </div>
@@ -139,33 +144,33 @@ const Home: React.FC = () => {
             
           <AddressContainer show={showAddress}>
             <div className="Field">
-              <label htmlFor="addressStreet" >Rua: </label>
-              <input type="text" id="addressStreet" readOnly={addressEditable.address} {...register("addressStreet", {required: true})}/>
+              <label htmlFor="Rua" >Rua: </label>
+              <input type="text" name="Rua" id="Rua" readOnly={addressEditable.address} {...register("addressStreet", {required: true})}/>
               {errors && errors.addressStreet && errors.addressStreet.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
             <div className="Field">
-              <label htmlFor="addressNumber" >Numero: </label>
-              <input type="text" id="addressNumber"  {...register("addressNumber", {required: true})}/>
+              <label htmlFor="Numero" >Numero: </label>
+              <input type="text" name-="Numero" id="Numero"  {...register("addressNumber", {required: true})}/>
               {errors && errors.addressNumber && errors.addressNumber.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
             <div className="Field">
-              <label htmlFor="addressComplement" >Complemento: </label>
-              <input type="text" id="addressComplement"  {...register("addressComplement", {required: true})}/>
+              <label htmlFor="Complemento" >Complemento: </label>
+              <input type="text" name="Complemento" id="Complemento"  {...register("addressComplement", {required: true})}/>
               {errors && errors.addressComplement && errors.addressComplement.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
             <div className="Field">
-              <label htmlFor="addressDistrict" >Bairro: </label>
-              <input type="text" id="addressDistrict" readOnly={addressEditable.district} {...register("addressDistrict", {required: true})}/>
+              <label htmlFor="Bairro" >Bairro: </label>
+              <input type="text" name="Bairro" id="Bairro" readOnly={addressEditable.district} {...register("addressDistrict", {required: true})}/>
               {errors && errors.addressDistrict && errors.addressDistrict.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
             <div className="Field">
-              <label htmlFor="addressCity" >Cidade: </label>
-              <input type="text" id="addressCity" readOnly={addressEditable.city} {...register("addressCity", {required: true})}/>
+              <label htmlFor="Cidade" >Cidade: </label>
+              <input type="text" name="Cidade"id="Cidade" readOnly={addressEditable.city} {...register("addressCity", {required: true})}/>
               {errors && errors.addressCity && errors.addressCity.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
             <div className="Field">
-              <label htmlFor="addressState" >Estado: </label>
-              <input type="text" id="addressState" readOnly={addressEditable.state} {...register("addressState", {required: true})}/>
+              <label htmlFor="Estado" >Estado: </label>
+              <input type="text" name="Estado"id="Estado" readOnly={addressEditable.state} {...register("addressState", {required: true})}/>
               {errors && errors.addressState && errors.addressState.type === 'required'? <p>Campo não Preenchido</p>: null}
             </div>
           </AddressContainer>

@@ -27,6 +27,11 @@ export const Main = styled.main`
   flex-direction: column;
   padding: 0px 10px;
   position: relative;
+  align-items: center;
+  justify-content: center;
+
+  h1{
+  }
 `;
 
 export const Formulario = styled.form`
