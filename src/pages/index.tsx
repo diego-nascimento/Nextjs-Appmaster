@@ -10,7 +10,7 @@ import {
   requiredFields //Campos Requiridos para preencher o endereço após consulta
 } from '../PageProtocols/indexProtocols' //As importações estão sendo feitas em PageProtocols
 import {IForm} from '../interfaces/IForm'  //Interface dos Formularios
-    
+  import Head from 'next/head'
     
 const Home: React.FC = () => {
   const { register, handleSubmit, formState: { errors}, getValues, setValue } = useForm() //React form
@@ -95,13 +95,6 @@ const Home: React.FC = () => {
     setShowAddress(true)  //Seta para mostrar os campos de endereço
   }  
 
-  const handleCepChange = () =>{
-    console.log('vai')
-    requiredFields.forEach(field => { //Reseta todos os campos antes da consulta
-      setValue(field.field, '', {shouldValidate: true})
-    });
-  }
-
   return (
     <Container>
       <Aside></Aside> {/*Campo com a Imagem*/}
@@ -115,6 +108,9 @@ const Home: React.FC = () => {
        {/*Os Estados do campos dos formularios são controlados pelo react-hook-form e as mascaras são feitas através  do react-input-mask*/}
         <h1>Formulario </h1>
         <Formulario onSubmit={handleSubmit(handle)} >
+          <Head>
+            <title>Formulario - Solicitar Adesivo</title>
+          </Head>
           <div className="Field">
             <label htmlFor="name" >Nome: </label>
             <input type="text" id="name"  {...register("name", {required: true})}/>
