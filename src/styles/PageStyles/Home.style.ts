@@ -6,7 +6,7 @@ export const Container = styled.div`
   width: calc(100% - 20px);
   min-height: 100vh;
 
-  @media(max-width: 800px){
+  @media(max-width: 1000px){
     grid-template-columns: 1fr;
     width: 100%;
   }
